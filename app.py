@@ -7,9 +7,8 @@ from pandas_datareader import wb
 
 app= Dash(__name__, external_stylesheets=[dbc.themes.MORPH])
 
-#df = pd.read_csv("API_ER.H2O.FWTL.ZS_DS2_en_csv_v2_13232.csv")
 indicators = {
-    "ER.H2O.FWTL.ZS":"Annual Freshwater Withdrawals",
+    "ER.H2O.FWTL.ZS":"Freshwater Withdrawals Total (% of Internal Resources)",
     "AG.LND.AGRI.ZS":"Agricultural Land (% of land Area)"
 }
 
@@ -28,7 +27,7 @@ the_asia = [
     "TH", "TL", "TR", "TM", "AE", "UZ", "VN", "YE"
 ]
 def update_wb_data():
-    # Retrieve specific world bank data from API
+
     df = wb.download(
         indicator=(list(indicators)), country=the_asia, start=2001, end=2021
     )
@@ -72,7 +71,6 @@ app.layout=dbc.Container(
                         id="my-dropdown",
                         options=[{"label": i, "value": i} for i in indicators.values()],
                         value=list(indicators.values())[0],
-                        # inputClassName="me-2",
                     ),
                 ],
                 width=4,
@@ -116,19 +114,7 @@ app.layout=dbc.Container(
                 [
                    html.Div(dcc.Graph(id="line-chart", figure={}), className="row"),
                     html.Div(
-            [
-                    #     html.Div(
-                    #         dcc.Dropdown(
-                    #         id="my-dropdown",
-                    #         multi=True,
-                    #         options=[
-                    #             {"label": x, "value": x}
-                    #             for x in sorted(countries["iso3c"])
-                    #         ],
-                    #     ),
-                    #     className="three columns",
-                    # ),
-                ],
+
                 className="row",
         ),
                 ],
@@ -165,7 +151,6 @@ def update_graph(n_clicks, stored_dataframe,years_chosen, indct_chosen):
 
     dff = update_wb_data()
     dff = pd.DataFrame.from_records(stored_dataframe)
-    #dff = dff[dff.year.between(years_chosen[0], years_chosen[1])]
 
 
     if years_chosen[0] != years_chosen[1]:
@@ -180,7 +165,7 @@ def update_graph(n_clicks, stored_dataframe,years_chosen, indct_chosen):
             scope="asia",
             hover_data={"iso3c": False, "country": True},
             labels={
-                indicators["ER.H2O.FWTL.ZS"]:"Annual Freshwater Withdrawals",
+                indicators["ER.H2O.FWTL.ZS"]:"Freshwater Withdrawals Total (% of Internal Resources)",
                 indicators["AG.LND.AGRI.ZS"]: "Agricultural Land (% of land Area)"
             },
         )
@@ -199,7 +184,7 @@ def update_graph(n_clicks, stored_dataframe,years_chosen, indct_chosen):
             scope="asia",
             hover_data={"iso3c": False, "country": True},
             labels={
-                indicators["ER.H2O.FWTL.ZS"]:"Annual Freshwater Withdrawals",
+                indicators["ER.H2O.FWTL.ZS"]:"Freshwater Withdrawals Total (% of Internal Resources)",
                 indicators["AG.LND.AGRI.ZS"]: "Agricultural Land (% of land Area)"
             },
         )
@@ -213,17 +198,15 @@ def update_graph(n_clicks, stored_dataframe,years_chosen, indct_chosen):
 ##line graph
 @app.callback(
     Output(component_id="line-chart", component_property="figure"),
-    #[Input(component_id="my-dropdown", component_property="value")],
     [Input(component_id="years-range", component_property="value")],
 )
 def update_graphs(years_chosen):
-    indct_chosen = "Annual Freshwater Withdrawals"
+    indct_chosen = "Freshwater Withdrawals Total (% of Internal Resources)"
     dff = update_wb_data()
     dff = dff[dff.year.between(years_chosen[0], years_chosen[1])]
 
     fig = px.line(
         data_frame=dff,
-        #locations="iso3c",
         x="year",
         y=indct_chosen,
         color="country",
@@ -236,7 +219,7 @@ def update_graphs(years_chosen):
 
     [Input("years-range", component_property="value")],)
 def bar_graph(years_chosen):
-    indct_chosen = "Annual Freshwater Withdrawals"
+    indct_chosen = "Freshwater Withdrawals Total (% of Internal Resources)"
     dff = update_wb_data()
     dff = dff[dff.year.between(years_chosen[0], years_chosen[1])]
     fig =px.bar(
